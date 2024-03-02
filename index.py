@@ -1,5 +1,9 @@
+import os
 import boto3
 import json
+
+current_directory = os.getcwd()
+print(current_directory)
 
 access_key = "AKIA3RSDCY4Z6PFUVFOJ"
 secret_access_key = "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"
@@ -17,12 +21,12 @@ body = {
 }
 
 response = bedrock_runtime_client.invoke_model(
-    modelId="amazon.titan-text-lite-v1", body=json.dumps(body)
+    modelId="ai21.j2-ultra-v1", body=json.dumps(body)
 )
 
 response_body = json.loads(response["body"].read())
-completion = response_body["completions"][0]["data"]["text"]
+response_text = response_body["completions"][0]["data"]["text"]
 
-          
+print(response_text)
 
 
