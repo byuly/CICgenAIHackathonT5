@@ -6,31 +6,25 @@ import streamlit as st
 current_directory = os.getcwd()
 print(current_directory)
 
+
 access_key = "AKIA3RSDCY4Z6PFUVFOJ"
 secret_access_key = "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"
 
 bedrock_runtime_client = boto3.client("bedrock-runtime", region_name="us-west-2", 
                                       aws_access_key_id=access_key, aws_secret_access_key=secret_access_key)
 
+input = []
 
-prompt = "Describe how to cook an egg"
+def extract_illnesses(input_string):
+    # Find the index of '[' and ']'
+    start_index = input_string.find('[')
+    end_index = input_string.find(']')
 
+    # Extract the substring containing the list
+    list_string = input_string[start_index:end_index + 1]
 
-body = {
-    "prompt": prompt,
-    "temperature": 0.5,
-    "maxTokens": 200,
-}
-
-response = bedrock_runtime_client.invoke_model(
-    modelId="ai21.j2-ultra-v1", body=json.dumps(body)
-)
-
-response_body = json.loads(response["body"].read())
-response_text = response_body["completions"][0]["data"]["text"]
-
-print(response_text)
-
+    # Convert the string representation of the list to a Python list
+    return eval(list_string)
 
 ###########
 
@@ -91,17 +85,20 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.image("data/Back_pain.webp", width=180)
     if st.button('Back Pain', key='1'):
-        st.write('1')
+        input.append('Back Pain')
+        st.write('Added')
 
 with col2:
     st.image("data/Coughing.jpeg", width=150)
     if st.button('Coughing', key='2'):
-        st.write('2')
+        input.append('Coughing')
+        st.write('Added')
 
 with col3:
     st.image("data/Difficulty_breathing.jpeg", width=150)
     if st.button('Difficulty in breathing', key='3'):
-        st.write('3')
+        input.append('Difficulty in breathing')
+        st.write('Added')
 
 # Row 2
 col4, col5, col6 = st.columns(3)
@@ -109,17 +106,20 @@ col4, col5, col6 = st.columns(3)
 with col4:
     st.image("data/Fever.jpeg", width=150)
     if st.button('Fever', key='4'):
-        st.write('4')
+        input.append('Fever')
+        st.write('Added')
 
 with col5:
     st.image('data/Joint_pain.jpeg', width=150)
     if st.button('Joint Pain', key='5'):
-        st.write('5')
+        input.append('Joint Pain')
+        st.write('Added')
 
 with col6:
     st.image("data/Nausea.jpeg", width=150)
     if st.button('Nausea', key='6'):
-        st.write('6')
+        input.append('Nausea')
+        st.write('Added')
 
 # Row 3
 col7, col8, col9 = st.columns(3)
@@ -127,18 +127,20 @@ col7, col8, col9 = st.columns(3)
 with col7:
     st.image("data/Neck_pain.jpg", width=150)
     if st.button('Neck Pain', key='7'):
-        st.write('7')
+        input.append('Neck Pain')
+        st.write('Added')
 
 with col8:
     st.image("data/Sore_throat.webp", width=150)
     if st.button('Sore Throat', key='8'):
-        st.write('8')
+        input.append('Sore Throat')
+        st.write('Added')
 
 with col9:
     st.image("data/Vomit.jpeg", width=180)
     if st.button('Vomit', key='9'):
-        st.write('9')
-
+        input.append('Vomit')
+        st.write('Added')
 
 # 확장 섹션
 with st.expander("About us"):
@@ -148,3 +150,58 @@ with st.expander("About us"):
 
 # 버튼 스타일링
 st.markdown('<style>.stButton>button{background-color:#0A9396;color:white;border-radius:5px;padding:10px 15px;}</style>', unsafe_allow_html=True)
+
+
+if st.button("Generate", key=10):
+    inputs = "["
+
+    for i in input:
+        inputs += i +", "
+
+    inputs = "]"
+
+    prompt = "I feel sick, my symptoms are: "
+    prompt += ", ".join(inputs) + "."
+    prompt += "What do you think these symptoms point to?"
+    prompt += "Only list the illnesses, no other words. just give me the words of the illnesses, like 'cold' or like 'cold, flu'"
+    prompt += " and just must give me the ONLY list of the illness using array, for example, [infection, flu, cold]"
+
+    body = {
+        "prompt": prompt,
+        "temperature": 0.5,
+        "maxTokens": 200,
+    }
+
+    response = bedrock_runtime_client.invoke_model(
+        modelId="ai21.j2-ultra-v1", body=json.dumps(body)
+    )
+
+    response_body = json.loads(response["body"].read())
+    response_text = response_body["completions"][0]["data"]["text"]
+
+        # Extract the illnesses from the input string
+    illness_list = extract_illnesses(response_text)
+    description_list = []
+    for i in illness_list:
+        prompt = "Give me the description of the illness: " + i
+        body = {
+        "prompt": prompt,
+        "temperature": 0.5,
+        "maxTokens": 200,
+        }
+
+        response = bedrock_runtime_client.invoke_model(
+            modelId="ai21.j2-ultra-v1", body=json.dumps(body)
+        )
+
+        response_body = json.loads(response["body"].read())
+        completion = response_body["completions"][0]["data"]["text"]
+
+        description_list.append(completion)
+
+    paragraph = "List of possible ilnesses: "
+    for i in range(len(illness_list)):
+        paragraph += "\n\n"
+        paragraph += illness_list[i] + ": " + description_list[i]
+
+    st.write(paragraph)
