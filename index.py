@@ -67,17 +67,18 @@ with st.sidebar:
     st.write("Enter your symptoms and find out possible diseases.")
     st.markdown('</div>', unsafe_allow_html=True)
 
-symptoms = st.text_input("What are your symptoms?", key="symptoms")
+st.write("What are your symptoms?")
+# symptoms = st.text_input("What are your symptoms?", key="symptoms")
 
-if st.button("Find Possible Disease", key="find_disease"):
-    if "headache" in symptoms.lower():
-        st.success("Possible diseases could be: Migraine, Tension headache")
-    elif "fever" in symptoms.lower():
-        st.warning("Possible diseases could be: Influenza, COVID-19, Common cold")
-    elif "stomachache" in symptoms.lower():
-        st.error("Possible diseases could be: Gastroenteritis, Indigestion")
-    else:
-        st.info("Symptoms are not specific. Please consult a doctor for a proper diagnosis.")
+# if st.button("Find Possible Disease", key="find_disease"):
+#     if "headache" in symptoms.lower():
+#         st.success("Possible diseases could be: Migraine, Tension headache")
+#     elif "fever" in symptoms.lower():
+#         st.warning("Possible diseases could be: Influenza, COVID-19, Common cold")
+#     elif "stomachache" in symptoms.lower():
+#         st.error("Possible diseases could be: Gastroenteritis, Indigestion")
+#     else:
+#         st.info("Symptoms are not specific. Please consult a doctor for a proper diagnosis.")
 
 # Create a image
 col1, col2, col3 = st.columns(3)
@@ -143,7 +144,7 @@ with col9:
         st.write('Added')
 
 # 확장 섹션
-with st.expander("About us"):
+with st.expander("Instructions (Click to view)"):
     st.write("""
         This is a symptom checker. Please note that this tool is not a replacement for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
     """)
@@ -160,11 +161,13 @@ if st.button("Generate", key=10):
 
     inputs = "]"
 
-    prompt = "I feel sick, my symptoms are: "
-    prompt += ", ".join(inputs) + "."
+    prompt = "You are my professional medical assistant"
+    prompt += "I feel sick, my symptoms are: "
+    prompt += ", ".join(inputs) + "." 
     prompt += "What do you think these symptoms point to?"
-    prompt += "Only list the illnesses, no other words. just give me the words of the illnesses, like 'cold' or like 'cold, flu'"
-    prompt += " and just must give me the ONLY list of the illness using array, for example, [infection, flu, cold]"
+    prompt += "Only list the illnesses, no other words. just give me the words of the illnesses for example"
+    prompt += " and just must give me the symtoms inside of arraylist [], for example ['cold', 'flu']"
+    prompt += "DO NOT use the example as a template"
 
     body = {
         "prompt": prompt,
