@@ -22,7 +22,6 @@ prompt += ", ".join(inputs) + "."
 prompt += "What do you think these symptoms point to?"
 prompt += "Only list the illnesses, no other words. just give me the words of the illnesses, like 'cold' or like 'cold, flu'"
 prompt += " and just must give me the ONLY list of the illness using array, for example, [infection, flu, cold]"
-print(prompt)
 
 
 body = {
@@ -73,10 +72,6 @@ paragraph = "List of possible ilnesses: "
 for i in range(len(illness_list)):
     paragraph += "\n\n"
     paragraph += illness_list[i] + ": " + description_list[i]
-
-class Paragraph:
-    def getParagraph():
-        return paragraph
 
 
     
